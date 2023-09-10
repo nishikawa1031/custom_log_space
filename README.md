@@ -1,30 +1,38 @@
 # CustomLogSpace
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/custom_log_space`. To experiment with that code, run `bin/console` for an interactive prompt.
+The CustomLogSpace gem allows Rails developers to direct Rails logs to files, organized by each controller and action. This organization simplifies debugging and analysis.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+To begin, add the gem to your application's Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
+```ruby
+group :development do
+  gem 'custom_log_space'
+end
+```
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+Next, run:
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+```bash
+$ bundle install
+```
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+Alternatively, you can install it directly using:
+
+```bash
+$ gem install custom_log_space
+```
 
 ## Usage
+Logs are saved in the `log/custom_log_space/[date]/[time]/[controller_name]/` directory. The filenames follow the pattern: "[action_name].log".
 
-TODO: Write usage instructions here
+<img width="492" alt="スクリーンショット 2023-09-12 8 37 43" src="https://github.com/nishikawa1031/custom_log_space/assets/53680568/95cf44c8-e256-44d0-b0cb-9d6367601985">
 
-## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+## Supported environments
+- Rails 7
+- Ruby 3
 
 ## Contributing
 
@@ -32,8 +40,8 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+This gem is open-sourced under the [MIT License](https://opensource.org/licenses/MIT) terms.
 
 ## Code of Conduct
 
-Everyone interacting in the CustomLogSpace project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/custom_log_space/blob/main/CODE_OF_CONDUCT.md).
+All participants in the CustomLogSpace project, whether they're interacting with codebases, issue trackers, chat rooms, or mailing lists, are expected to follow the [code of conduct](https://github.com/nishikawa1031/custom_logger/blob/main/CODE_OF_CONDUCT.md).
