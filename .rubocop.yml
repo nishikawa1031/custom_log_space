@@ -10,4 +10,8 @@ Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
 
 Layout/LineLength:
-  Max: 120
+  Max: 150
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'

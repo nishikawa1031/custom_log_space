@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "active_support/all"
 require "custom_log_space"
 
 RSpec.configure do |config|
