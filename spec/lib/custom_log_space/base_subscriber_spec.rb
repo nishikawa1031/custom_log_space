@@ -166,4 +166,40 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
       end
     end
   end
+
+  describe "#cleanup_old_directories" do
+    let(:base_directory) { Rails.root.join("log", "custom_log_space") }
+
+    before do
+      allow(FileUtils).to receive(:rm_rf)
+    end
+
+    context "when there are more than 2 date-directories" do
+      let(:directories) { %w[20230101 20230102 20230103] }
+
+      before do
+        allow(Dir).to receive(:entries).with(base_directory.to_s).and_return(directories)
+        allow(File).to receive(:directory?).and_return(true)
+      end
+
+      it "removes the oldest directory to maintain only 2 date-directories" do
+        expect(FileUtils).to receive(:rm_rf).with(File.join(base_directory, "20230101"))
+        subscriber.send(:cleanup_old_directories)
+      end
+    end
+
+    context "when there are 3 or fewer date-directories" do
+      let(:directories) { %w[20230101 20230102] }
+
+      before do
+        allow(Dir).to receive(:entries).with(base_directory.to_s).and_return(directories)
+        allow(File).to receive(:directory?).and_return(true)
+      end
+
+      it "does not remove any directories" do
+        expect(FileUtils).not_to receive(:rm_rf)
+        subscriber.send(:cleanup_old_directories)
+      end
+    end
+  end
 end

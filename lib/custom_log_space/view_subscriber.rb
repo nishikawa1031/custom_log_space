@@ -2,6 +2,7 @@
 
 # ViewSubscriber logs view rendering events for CustomLogSpace.
 # It tracks events like template rendering, partial rendering, and collection rendering.
+# https://github.com/rails/rails/blob/7-0-stable/actionview/lib/action_view/log_subscriber.rb
 class ViewSubscriber < CustomLogSpace::BaseSubscriber
   def render_template(event)
     identifier = event.payload[:identifier]

@@ -3,6 +3,7 @@
 module CustomLogSpace
   # CustomLogSpace::Subscriber is a class for handling custom logging in Rails applications.
   # It provides methods for processing different types of log events and organizing log messages.
+  # https://github.com/rails/rails/blob/7-0-stable/activesupport/lib/active_support/log_subscriber.rb
   class BaseSubscriber < ActiveSupport::LogSubscriber
     def start_processing(event)
       setup_thread_variables(event.payload)
@@ -49,6 +50,21 @@ module CustomLogSpace
 
       FileUtils.mkdir_p(controller_log_directory) unless Dir.exist?(controller_log_directory)
       write_to_custom_log(message)
+      cleanup_old_directories
+    end
+
+    def cleanup_old_directories
+      base_directory = File.join(Rails.root, "log", "custom_log_space")
+      all_directories = Dir.entries(base_directory).select do |entry|
+        File.directory?(File.join(base_directory, entry)) && entry !~ /^\./
+      end.sort
+
+      # If there are more than 2 date-directories, remove the oldest one
+      while all_directories.size > 2
+        directory_to_remove = all_directories.shift
+        path_to_remove = File.join(base_directory, directory_to_remove)
+        FileUtils.rm_rf(path_to_remove)
+      end
     end
 
     def custom_log_directory
