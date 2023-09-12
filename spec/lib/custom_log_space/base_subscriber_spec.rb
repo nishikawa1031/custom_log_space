@@ -128,7 +128,7 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
 
       it "outputs the appropriate error message" do
         expect do
-          CustomLogSpace::LogWriter.write_to_custom_log(mocked_path, message) do |file|
+          subscriber.send(:write_to_custom_log, message) do |file|
             file.puts "Header"
           end
         end.to output("Error: No such file or directory - No such file or directory @ rb_sysopen - #{mocked_path}\n").to_stdout
@@ -146,7 +146,7 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
 
       it "outputs the appropriate error message" do
         expect do
-          CustomLogSpace::LogWriter.write_to_custom_log(mocked_path, message) do |file|
+          subscriber.send(:write_to_custom_log, message) do |file|
             file.puts "Header"
           end
         end.to output("IO Error: dummy IOError\n").to_stdout

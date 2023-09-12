@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 module CustomLogSpace
-  # The LogFormatter class is responsible for formatting log messages.
-  class LogFormatter
-    def self.format_message(event)
+  # The LogFormatter module is responsible for formatting log messages.
+  module LogFormatter
+    private
+
+    def format_message(event)
       payload = event.payload
       status = payload[:status]
       duration = event.duration.round(2)

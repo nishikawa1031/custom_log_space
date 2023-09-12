@@ -9,12 +9,15 @@ module CustomLogSpace
   # It provides methods for processing different types of log events and organizing log messages.
   # https://github.com/rails/rails/blob/7-0-stable/activesupport/lib/active_support/log_subscriber.rb
   class BaseSubscriber < ActiveSupport::LogSubscriber
+    include CustomLogSpace::LogWriter
+    include CustomLogSpace::LogFormatter
+
     def start_processing(event)
       ThreadManager.setup(event.payload)
     end
 
     def process_action(event)
-      message = LogFormatter.format_message(event)
+      message = format_message(event)
       log_message(message)
       ThreadManager.clear
     end
@@ -27,8 +30,7 @@ module CustomLogSpace
 
       return unless current_controller && current_action
 
-      directory_path = controller_log_directory
-      LogWriter.write_to_custom_log(directory_path, message) do |file|
+      write_to_custom_log(message) do |file|
         write_header_information(file)
       end
 
@@ -47,17 +49,6 @@ module CustomLogSpace
         path_to_remove = File.join(base_directory, directory_to_remove)
         FileUtils.rm_rf(path_to_remove)
       end
-    end
-
-    def custom_log_directory
-      today = Time.now.strftime("%Y%m%d")
-      time = Time.now.strftime("%H%M")
-      File.join(Rails.root, "log", "custom_log_space", today, time)
-    end
-
-    def controller_log_directory
-      controller_name = Thread.current[:current_controller].underscore
-      File.join(custom_log_directory, controller_name)
     end
 
     def write_header_information(file)
