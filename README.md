@@ -25,7 +25,7 @@ $ gem install custom_log_space
 ```
 
 ## Usage
-Logs are saved in the `log/custom_log_space/[date]/[time]/[controller_name]/` directory. The filenames follow the pattern: `[action_name].log`.
+Logs are saved in the `log/custom_log_space/#{path}/#{controller_name}_#{action_name}/#{date}/#{time}.log`.
 
 <img width="492" alt="スクリーンショット 2023-09-12 8 37 43" src="https://github.com/nishikawa1031/custom_log_space/assets/53680568/95cf44c8-e256-44d0-b0cb-9d6367601985">
 
