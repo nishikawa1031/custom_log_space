@@ -15,6 +15,9 @@ module Rack
 end
 
 require "custom_log_space/base_subscriber"
+require "custom_log_space/log_formatter"
+require "custom_log_space/thread_manager"
+require "custom_log_space/log_writer"
 
 RSpec.describe CustomLogSpace::BaseSubscriber do
   let(:subscriber) { described_class.new }
@@ -24,16 +27,13 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
   end
 
   after do
-    Thread.current.keys.each do |key|
-      Thread.current[key] = nil
-    end
+    CustomLogSpace::ThreadManager.clear
   end
 
   before do
-    Thread.current[:current_controller] = "TestController"
-    Thread.current[:current_action] = "test_action"
+    allow(CustomLogSpace::ThreadManager).to receive(:setup)
+    allow(CustomLogSpace::ThreadManager).to receive(:clear)
   end
-
   before do
     log_dir = Rails.root.join("log", "custom_log_space")
     FileUtils.mkdir_p(log_dir) unless Dir.exist?(log_dir)
@@ -52,12 +52,9 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
       }
     end
 
-    it "sets the current controller, action, path, and params" do
+    it "sets up the thread manager with event payload" do
       subscriber.start_processing(event)
-      expect(Thread.current[:current_controller]).to eq("TestController")
-      expect(Thread.current[:current_action]).to eq("test_action")
-      expect(Thread.current[:path]).to eq("/test_path")
-      expect(Thread.current[:params]).to eq({ key: "value" })
+      expect(CustomLogSpace::ThreadManager).to have_received(:setup).with(event_payload)
     end
   end
 
@@ -73,6 +70,7 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
     before do
       Thread.current[:current_controller] = "TestController"
       Thread.current[:current_action] = "test_action"
+      Thread.current[:header_written] = false
       allow(File).to receive(:open)
     end
 
@@ -111,32 +109,28 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
 
     it "clears thread variables after processing" do
       subscriber.process_action(event)
-
-      expect(Thread.current[:current_controller]).to be_nil
-      expect(Thread.current[:current_action]).to be_nil
-      expect(Thread.current[:path]).to be_nil
-      expect(Thread.current[:params]).to be_nil
-      expect(Thread.current[:header_written]).to be_nil
+      expect(CustomLogSpace::ThreadManager).to have_received(:clear)
     end
   end
 
   # While it's a private method, it includes error handling logic, so we should add tests for it.
-  describe "#write_to_custom_log" do
+  describe "#log_message" do
     let(:message) { "Test message" }
+    let(:mocked_path) { "/dummy/path/to/file.log" }
 
     context "when file cannot be opened due to Errno::ENOENT" do
-      let(:mocked_path) { "/dummy/path/to/file.log" }
-
       before do
         Thread.current[:current_controller] = "TestController"
         Thread.current[:current_action] = "test_action"
-        allow(subscriber).to receive(:custom_log_file_path).and_return(mocked_path)
+        allow(CustomLogSpace::LogWriter).to receive(:custom_log_file_path).and_return(mocked_path)
         allow(File).to receive(:open).with(mocked_path, "a").and_raise(Errno::ENOENT.new("No such file or directory @ rb_sysopen - #{mocked_path}"))
       end
 
       it "outputs the appropriate error message" do
         expect do
-          subscriber.send(:write_to_custom_log, message)
+          CustomLogSpace::LogWriter.write_to_custom_log(mocked_path, message) do |file|
+            file.puts "Header"
+          end
         end.to output("Error: No such file or directory - No such file or directory @ rb_sysopen - #{mocked_path}\n").to_stdout
       end
     end
@@ -152,17 +146,10 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
 
       it "outputs the appropriate error message" do
         expect do
-          subscriber.send(:write_to_custom_log, message)
+          CustomLogSpace::LogWriter.write_to_custom_log(mocked_path, message) do |file|
+            file.puts "Header"
+          end
         end.to output("IO Error: dummy IOError\n").to_stdout
-      end
-    end
-
-    context "when opening and closing the log file" do
-      it "opens and closes the file correctly" do
-        expected_path = subscriber.send(:custom_log_file_path)
-
-        expect(File).to receive(:open).with(expected_path, "a").and_yield(StringIO.new)
-        subscriber.send(:write_to_custom_log, message)
       end
     end
   end
