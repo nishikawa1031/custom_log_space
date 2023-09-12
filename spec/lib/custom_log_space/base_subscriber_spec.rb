@@ -75,8 +75,7 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
     end
 
     it "logs the process action event to a custom log file with the correct path and filename" do
-      expected_path = Rails.root.join("log", "custom_log_space", Time.now.strftime("%Y%m%d").to_s, Time.now.strftime("%H%M").to_s,
-                                      "test_controller", "test_action.log").to_s
+      expected_path = Rails.root.join("log", "custom_log_space", "test_controller", "test_action", Time.now.strftime("%Y-%m-%d").to_s, Time.now.strftime("%H:%M").to_s + ".log").to_s
       expect(File).to receive(:open).with(expected_path, "a").and_yield(StringIO.new)
       subscriber.process_action(event)
     end

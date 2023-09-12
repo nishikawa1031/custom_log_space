@@ -10,6 +10,9 @@ require "custom_log_space/sql_subscriber"
 
 RSpec.describe SQLSubscriber do
   let(:subscriber) { described_class.new }
+  let(:expected_path) {
+    Rails.root.join("log", "custom_log_space", "test_controller", "test_action", Time.now.strftime("%Y-%m-%d").to_s, Time.now.strftime("%H:%M").to_s + ".log").to_s
+  }
 
   after do
     Thread.current.keys.each do |key|
@@ -33,8 +36,6 @@ RSpec.describe SQLSubscriber do
     end
 
     it "logs the SQL event to a custom log file" do
-      expected_path = Rails.root.join("log", "custom_log_space", Time.now.strftime("%Y%m%d").to_s, Time.now.strftime("%H%M").to_s,
-                                      "test_controller", "test_action.log").to_s
       expect(File).to receive(:open).with(expected_path, "a")
       subscriber.sql(event)
     end
