@@ -7,7 +7,7 @@ module CustomLogSpace
     private
 
     def write_to_custom_log(message)
-      directory_path = custom_log_directory
+      directory_path = controller_log_directory
       FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
       custom_log_path = custom_log_file_path(directory_path)
 
