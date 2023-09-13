@@ -19,6 +19,7 @@ module CustomLogSpace
     def process_action(event)
       message = format_message(event)
       log_message(message)
+
       ThreadManager.clear
     end
 
@@ -27,15 +28,49 @@ module CustomLogSpace
     def log_message(message)
       current_controller = Thread.current[:current_controller]
       current_action = Thread.current[:current_action]
-
+    
       return unless current_controller && current_action
 
-      write_to_custom_log(message) do |file|
-        write_header_information(file)
+      p "__log_message__"
+      p routes = Rails.application.routes.routes
+      root_route = routes.find { |route| route.path.spec.to_s == '/' }
+      root_controller_action = { controller: root_route.defaults[:controller], action: root_route.defaults[:action] } if root_route
+    
+      if root_controller_action && root_controller_action[:controller] == current_controller && root_controller_action[:action] == current_action
+        # リロード時のルートの場合の処理（別のログファイルに書き込み）
+        write_to_special_log(message) do |file|
+          write_header_information(file)
+        end
+      else
+        # 通常のルートの場合の処理
+        write_to_custom_log(message) do |file|
+          write_header_information(file)
+        end
       end
-
+    
       cleanup_old_directories
     end
+
+    def controller_action_list
+      # routes.rbを読み込む
+      routes = Rails.application.routes.routes
+
+      # 有効なコントローラーとアクションのリストを初期化
+      controller_action_list = []
+
+      # 各ルートを反復処理
+      routes.each do |route|
+        # ルートからコントローラーとアクションを抽出
+        controller = route.defaults[:controller]
+        action = route.defaults[:action]
+
+        # コントローラーとアクションが存在する場合にのみリストに追加
+        if controller && action
+          controller_action_list << { controller: controller, action: action }
+        end
+      end
+    end
+    
 
     def cleanup_old_directories
       base_directory = File.join(Rails.root, "log", "custom_log_space")
