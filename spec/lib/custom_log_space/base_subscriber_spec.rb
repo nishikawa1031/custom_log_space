@@ -75,7 +75,8 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
     end
 
     it "logs the process action event to a custom log file with the correct path and filename" do
-      expected_path = Rails.root.join("log", "custom_log_space", "test_controller", "test_action", Time.now.strftime("%Y-%m-%d").to_s, Time.now.strftime("%H:%M").to_s + ".log").to_s
+      expected_path = Rails.root.join("log", "custom_log_space", "test_controller", "test_action", Time.now.strftime("%Y-%m-%d").to_s,
+                                      "#{Time.now.strftime("%H:%M")}.log").to_s
       expect(File).to receive(:open).with(expected_path, "a").and_yield(StringIO.new)
       subscriber.process_action(event)
     end
@@ -122,15 +123,17 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
         Thread.current[:current_controller] = "TestController"
         Thread.current[:current_action] = "test_action"
         allow(CustomLogSpace::LogWriter).to receive(:custom_log_file_path).and_return(mocked_path)
-        allow(File).to receive(:open).with(mocked_path, "a").and_raise(Errno::ENOENT.new("No such file or directory @ rb_sysopen - #{mocked_path}"))
+        allow(File).to receive(:open).and_raise(Errno::ENOENT.new("No such file or directory @ rb_sysopen - #{mocked_path}"))
       end
 
-      it "outputs the appropriate error message" do
+      it "outputs the appropriate error message and has a correct log path" do
         expect do
           subscriber.send(:write_to_custom_log, message) do |file|
             file.puts "Header"
           end
         end.to output("Error: No such file or directory - No such file or directory @ rb_sysopen - #{mocked_path}\n").to_stdout
+
+        expect(File).to have_received(:open).with(a_string_matching(%r{/custom_log_space/test_controller/test_action/.*\.log$}), "a")
       end
     end
 
@@ -149,42 +152,6 @@ RSpec.describe CustomLogSpace::BaseSubscriber do
             file.puts "Header"
           end
         end.to output("IO Error: dummy IOError\n").to_stdout
-      end
-    end
-  end
-
-  describe "#cleanup_old_directories" do
-    let(:base_directory) { Rails.root.join("log", "custom_log_space") }
-
-    before do
-      allow(FileUtils).to receive(:rm_rf)
-    end
-
-    context "when there are more than 2 date-directories" do
-      let(:directories) { %w[20230101 20230102 20230103] }
-
-      before do
-        allow(Dir).to receive(:entries).with(base_directory.to_s).and_return(directories)
-        allow(File).to receive(:directory?).and_return(true)
-      end
-
-      it "removes the oldest directory to maintain only 2 date-directories" do
-        expect(FileUtils).to receive(:rm_rf).with(File.join(base_directory, "20230101"))
-        subscriber.send(:cleanup_old_directories)
-      end
-    end
-
-    context "when there are 3 or fewer date-directories" do
-      let(:directories) { %w[20230101 20230102] }
-
-      before do
-        allow(Dir).to receive(:entries).with(base_directory.to_s).and_return(directories)
-        allow(File).to receive(:directory?).and_return(true)
-      end
-
-      it "does not remove any directories" do
-        expect(FileUtils).not_to receive(:rm_rf)
-        subscriber.send(:cleanup_old_directories)
       end
     end
   end

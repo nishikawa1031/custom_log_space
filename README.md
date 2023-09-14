@@ -27,7 +27,31 @@ $ gem install custom_log_space
 ## Usage
 Logs are saved in the `log/custom_log_space/#{controller_name}/#{action_name}/#{date}/#{time}.log`.
 
-<img width="492" alt="スクリーンショット 2023-09-12 8 37 43" src="https://github.com/nishikawa1031/custom_log_space/assets/53680568/95cf44c8-e256-44d0-b0cb-9d6367601985">
+```
+user log % tree
+.
+├── custom_log_space
+│   └── articles_controller
+│       ├── index
+│       │   ├── 2023-09-14
+│       │   │   ├── 08:45.log
+│       │   │   └── 08:46.log
+│       │   └── 2023-09-15
+│       │       ├── 02:10.log
+│       │       ├── 08:10.log
+│       │       └── 08:11.log
+│       ├── new
+│       │   └── 2023-09-14
+│       │       └── 08:45.log
+│       └── show
+│           └── 2023-09-15
+│               └── 02:10.log
+└── development.log
+```
+
+## Retention Policy
+
+To prevent excessive disk usage, logs within the `date` directory are retained for only 3 days. Any logs older than this retention period will be automatically deleted, starting with the oldest. Ensure that you archive or backup logs if you need them for longer periods.
 
 ## Ignoring Logs in Git
 If needed, add `/log/custom_log_space/*` to your `.gitignore` to ensure the logs aren't committed to your repository.
