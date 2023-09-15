@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.1.4] - 2023-09-15
+### Changed
+Simplify the gem description
+
 ## [0.1.3] - 2023-09-15
 ### Changed
 The retention period for logs within the date directory has been changed from 3 days to 2 days.
