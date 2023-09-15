@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["tatsunishitatsu@gmail.com"]
 
   spec.summary = "A Rails logger extension that organizes logs by controller and action into dedicated folders."
-  spec.description = "CustomLogSpace refines Rails logs by categorizing them by controller and action. It provides a clearer view."
+  spec.description = "This gem organizes Rails logs by controller and action, eliminating the need to start the server for log checks."
   spec.homepage = "https://github.com/nishikawa1031/custom_log_space.git"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
