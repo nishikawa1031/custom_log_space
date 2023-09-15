@@ -6,7 +6,7 @@ module Rails
   end
 end
 
-require "custom_log_space/view_subscriber"
+require "custom_log_space/subscribers/view_subscriber"
 
 RSpec.describe ViewSubscriber do
   let(:subscriber) { described_class.new }

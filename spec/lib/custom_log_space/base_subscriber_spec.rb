@@ -14,7 +14,7 @@ module Rack
   end
 end
 
-require "custom_log_space/base_subscriber"
+require "custom_log_space/subscribers/base_subscriber"
 require "custom_log_space/base_helper/log_formatter"
 require "custom_log_space/base_helper/thread_manager"
 require "custom_log_space/base_helper/log_writer"
