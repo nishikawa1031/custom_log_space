@@ -40,7 +40,7 @@ RSpec.describe CustomLogSpace::LogWriter do
     end
 
     context "with more than three date directories" do
-      let(:dates) { %w[2023-09-01 2023-09-02 2023-09-03 2023-09-04] }
+      let(:dates) { %w[2023-09-01 2023-09-02 2023-09-03] }
 
       before do
         dates.each do |date|
@@ -57,12 +57,11 @@ RSpec.describe CustomLogSpace::LogWriter do
       it "keeps the three newest directories" do
         expect(Dir.exist?(File.join(base_directory, dates[1]))).to be(true)
         expect(Dir.exist?(File.join(base_directory, dates[2]))).to be(true)
-        expect(Dir.exist?(File.join(base_directory, dates[3]))).to be(true)
       end
     end
 
     context "with three or fewer date directories" do
-      let(:dates) { %w[2023-09-01 2023-09-02 2023-09-03] }
+      let(:dates) { %w[2023-09-01 2023-09-02] }
 
       before do
         dates.each do |date|

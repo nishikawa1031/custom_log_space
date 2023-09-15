@@ -23,7 +23,7 @@ module CustomLogSpace
       return unless Dir.exist?(action_directory)
 
       # If there are more than 3 date-directories, remove the oldest ones
-      remove_oldest_directory while all_directories.size > 3
+      remove_oldest_directory while all_directories.size > 2
     end
 
     def all_directories

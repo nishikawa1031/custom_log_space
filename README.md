@@ -53,7 +53,7 @@ user log % tree
 
 ## Retention Policy
 
-To prevent excessive disk usage, logs within the `date` directory are retained for only 3 days. Any logs older than this retention period will be automatically deleted, starting with the oldest. Ensure that you archive or backup logs if you need them for longer periods.
+To prevent excessive disk usage, logs within the `date` directory are retained for only 2 days. Any logs older than this retention period will be automatically deleted, starting with the oldest. Ensure that you archive or backup logs if you need them for longer periods.
 
 ## Ignoring Logs in Git
 If needed, add `/log/custom_log_space/*` to your `.gitignore` to ensure the logs aren't committed to your repository.
