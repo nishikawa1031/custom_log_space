@@ -2,6 +2,8 @@
 
 The CustomLogSpace gem allows Rails developers to direct Rails logs to files, organized by each controller and action. This organization simplifies debugging and analysis.
 
+Thanks to this gem, developers are freed from the hassle of constantly starting the rails server to check logs every time an action in a controller is executed.
+
 ## Installation
 
 To begin, add the gem to your application's Gemfile:
