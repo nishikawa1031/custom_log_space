@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.1.3] - 2023-09-15
+### Changed
+The retention period for logs within the date directory has been changed from 3 days to 2 days.
+
 ## [0.1.2] - 2023-09-15
 ### Changed
 Modified the file path structure for logs. New structure: log/custom_log_space/#{controller_name}/#{action_name}/#{date}/#{time}.log.
