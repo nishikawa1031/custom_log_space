@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "custom_log_space/log_writer"
+require "custom_log_space/base_helper/log_writer"
 
 module Rails
   def self.root

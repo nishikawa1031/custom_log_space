@@ -15,9 +15,9 @@ module Rack
 end
 
 require "custom_log_space/base_subscriber"
-require "custom_log_space/log_formatter"
-require "custom_log_space/thread_manager"
-require "custom_log_space/log_writer"
+require "custom_log_space/base_helper/log_formatter"
+require "custom_log_space/base_helper/thread_manager"
+require "custom_log_space/base_helper/log_writer"
 
 RSpec.describe CustomLogSpace::BaseSubscriber do
   let(:subscriber) { described_class.new }

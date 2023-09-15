@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "custom_log_space/log_formatter"
-require "custom_log_space/thread_manager"
-require "custom_log_space/log_writer"
+require "custom_log_space/base_helper/log_formatter"
+require "custom_log_space/base_helper/thread_manager"
+require "custom_log_space/base_helper/log_writer"
 
 module CustomLogSpace
   # CustomLogSpace::Subscriber is a class for handling custom logging in Rails applications.
