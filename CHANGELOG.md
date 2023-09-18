@@ -1,4 +1,8 @@
 ## [Unreleased]
+## [0.1.6] - 2023-09-19
+### Changed
+I have modified the implementation to create a 'saved' folder.
+`log/custom_log_space/#{controller_name}/#{action_name}/saved/`
 
 ## [0.1.5] - 2023-09-18
 ### Changed

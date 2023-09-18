@@ -27,13 +27,14 @@ module CustomLogSpace
     def cleanup_old_directories
       return unless Dir.exist?(base_directory_path)
 
-      # If there are more than 2 date-directories, remove the oldest ones
-      remove_oldest_directory while all_directories.size > 2
+      # If there are more than 2 date-directories(except saved directory), remove the oldest ones
+      remove_oldest_directory while all_directories.size > 3
     end
 
     def all_directories
       @all_directories ||= Dir.entries(base_directory_path).select do |entry|
-        File.directory?(File.join(base_directory_path, entry)) && entry !~ /^\./
+        path = File.join(base_directory_path, entry)
+        File.directory?(path) && entry !~ /^\./ && entry != "saved"
       end.sort
     end
 
@@ -48,8 +49,9 @@ module CustomLogSpace
     end
 
     def write_to_custom_log(message)
-      directory_path = File.join(base_directory_path, Time.now.strftime("%Y-%m-%d"))
-      FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
+      create_saved_directory
+      directory_path = create_log_directory
+
       custom_log_path = "#{directory_path}/#{Time.now.strftime("%H:%M")}.log"
 
       File.open(custom_log_path, "a") do |file|
@@ -61,6 +63,18 @@ module CustomLogSpace
     rescue SystemCallError, IOError => e
       error_prefix = e.is_a?(SystemCallError) ? "Error" : "IO Error"
       puts "#{error_prefix}: #{e.message}"
+    end
+
+    # Create the 'saved' directory (but don't place logs in it)
+    def create_saved_directory
+      saved_directory_path = File.join(base_directory_path, "saved")
+      FileUtils.mkdir_p(saved_directory_path) unless Dir.exist?(saved_directory_path)
+    end
+
+    def create_log_directory
+      directory_path = File.join(base_directory_path, Time.now.strftime("%Y-%m-%d"))
+      FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
+      directory_path
     end
 
     def cleanup_old_log_files(directory_path)

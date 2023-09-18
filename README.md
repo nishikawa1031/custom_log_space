@@ -34,30 +34,28 @@ user log % tree
 ├── custom_log_space
 │   └── articles_controller
 │       ├── index
-│       │   ├── 2023-09-14
-│       │   │   ├── 08:45.log
-│       │   │   └── 08:46.log
-│       │   └── 2023-09-15
-│       │       ├── 02:10.log
-│       │       ├── 08:10.log
-│       │       └── 08:11.log
-│       ├── new
-│       │   └── 2023-09-14
-│       │       └── 08:45.log
+│       │   ├── 2023-09-19
+│       │   │   ├── 09:13.log
+│       │   │   └── 20:00.log
+│       │   └── saved
 │       └── show
-│           └── 2023-09-15
-│               └── 02:10.log
+│           ├── 2023-09-18
+│           │   ├── 21:29.log
+│           │   └── 22:02.log
+│           ├── 2023-09-19
+│           │   └── 20:00.log
+│           └── saved
 └── development.log
 ```
 
-## Retention Policy
-To ensure optimal system performance and to prevent excessive disk usage, our logging system implements a strict retention policy:
+## Log Retention Policy
+To maintain system performance and manage disk space:
 
-* Date Directory Limitation: Only up to 2 date directories can be created. Any additional date directory beyond this limit will lead to the automatic deletion of the oldest directory.
-
-* File Limitation: Only up to 10 log files can be created within the date directory. Ensure to manage the number of logs being generated to stay within this limit.
-
-Important: If you require logs to be retained for longer periods or need to keep more extensive records, make sure to archive or backup the necessary log files regularly to prevent any unwanted data loss.
+* Date Directory: Max of 2 date-folders, excluding 'saved'. A third will remove the oldest.
+* File Limit: Up to 10 log files per date folder. Monitor your logs to stay within this.
+* Extended Retention: Need logs longer? Archive or back up them. Accidental losses are avoided this way.
+Remember: Files in the 'saved' directory won't be deleted. To keep a log, move it there:
+`log/custom_log_space/#{controller_name}/#{action_name}/saved/`
 
 ## Ignoring Logs in Git
 If needed, add `/log/custom_log_space/*` to your `.gitignore` to ensure the logs aren't committed to your repository.

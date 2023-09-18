@@ -18,7 +18,7 @@ RSpec.describe CustomLogSpace::LogWriter do
   before do
     # This allows us to call private methods for testing purposes.
     dummy_class.class_eval do
-      public :cleanup_old_directories, :cleanup_old_log_files
+      public :cleanup_old_directories, :cleanup_old_log_files, :write_to_custom_log
     end
   end
 
@@ -30,6 +30,21 @@ RSpec.describe CustomLogSpace::LogWriter do
     allow(Thread.current).to receive(:[]).with(:current_action).and_return(action_name)
   end
 
+  # Although it's generally not recommended to test private methods, in this case,
+  # we're doing so to ensure the core functionality remains robust and accurate.
+  describe "#write_to_custom_log" do
+    context "when writing a log" do
+      before do
+        FileUtils.mkdir_p(base_directory)
+        dummy_instance.write_to_custom_log("Test Message") { |file| file.write("Test Message") }
+      end
+
+      it "creates a 'saved' directory" do
+        expect(Dir.exist?(File.join(base_directory, "saved"))).to be(true)
+      end
+    end
+  end
+
   describe "#cleanup_old_directories" do
     before do
       FileUtils.mkdir_p(base_directory)
@@ -39,8 +54,8 @@ RSpec.describe CustomLogSpace::LogWriter do
       FileUtils.rm_rf(base_directory)
     end
 
-    context "with more than three date directories" do
-      let(:dates) { %w[2023-09-01 2023-09-02 2023-09-03] }
+    context "with more than four date directories" do
+      let(:dates) { %w[saved 2023-09-01 2023-09-02 2023-09-03] }
 
       before do
         dates.each do |date|
@@ -51,17 +66,15 @@ RSpec.describe CustomLogSpace::LogWriter do
       end
 
       it "removes the oldest directory" do
-        expect(Dir.exist?(File.join(base_directory, dates.first))).to be(false)
-      end
-
-      it "keeps the three newest directories" do
-        expect(Dir.exist?(File.join(base_directory, dates[1]))).to be(true)
-        expect(Dir.exist?(File.join(base_directory, dates[2]))).to be(true)
+        expect(Dir.exist?(File.join(base_directory, dates.first))).to be(true)
+        expect(Dir.exist?(File.join(base_directory, dates.second))).to be(false)
+        expect(Dir.exist?(File.join(base_directory, dates.third))).to be(true)
+        expect(Dir.exist?(File.join(base_directory, dates.last))).to be(true)
       end
     end
 
-    context "with three or fewer date directories" do
-      let(:dates) { %w[2023-09-01 2023-09-02] }
+    context "with four or fewer date directories" do
+      let(:dates) { %w[saved 2023-09-01 2023-09-02] }
 
       before do
         dates.each do |date|
