@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'find'
 
 module CustomLogSpace
   # The LogWriter module provides methods for writing log messages to custom log files.
@@ -21,14 +22,30 @@ module CustomLogSpace
         write_header_information(file)
       end
 
-      cleanup_old_directories
+      cleanup_logs
     end
 
-    def cleanup_old_directories
-      return unless Dir.exist?(base_directory_path)
-
-      # If there are more than 2 date-directories, remove the oldest ones
+    def cleanup_logs
+      # Date directories cleanup
       remove_oldest_directory while all_directories.size > 2
+
+      # Size based cleanup
+      cleanup_logs_by_size
+    end
+
+    def cleanup_logs_by_size
+      while total_log_size > 50.megabytes
+        oldest_log_file = Dir.glob(File.join(Rails.root, "log", "custom_log_space", "**", "*")).select { |f| File.file?(f) }.sort_by { |f| File.mtime(f) }.first
+        FileUtils.rm(oldest_log_file) if oldest_log_file
+      end
+    end
+
+    def total_log_size
+      total_size = 0
+      Find.find(File.join(Rails.root, "log", "custom_log_space")) do |path|
+        total_size += File.size(path) if File.file?(path)
+      end
+      total_size
     end
 
     def all_directories
