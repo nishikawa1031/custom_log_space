@@ -56,9 +56,20 @@ module CustomLogSpace
         yield(file) # Header or other info can be passed and written here
         file.puts(message)
       end
+
+      cleanup_old_log_files(directory_path)
     rescue SystemCallError, IOError => e
       error_prefix = e.is_a?(SystemCallError) ? "Error" : "IO Error"
       puts "#{error_prefix}: #{e.message}"
+    end
+
+    def cleanup_old_log_files(directory_path)
+      log_files = Dir.entries(directory_path).select { |entry| entry =~ /\.log$/ }.sort
+      while log_files.size > 10
+        oldest_log_file = log_files.shift
+        path_to_remove = File.join(directory_path, oldest_log_file)
+        File.delete(path_to_remove)
+      end
     end
 
     # rubocop:disable Metrics/AbcSize

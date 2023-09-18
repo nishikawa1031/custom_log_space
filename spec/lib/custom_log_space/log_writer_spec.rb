@@ -18,7 +18,7 @@ RSpec.describe CustomLogSpace::LogWriter do
   before do
     # This allows us to call private methods for testing purposes.
     dummy_class.class_eval do
-      public :cleanup_old_directories
+      public :cleanup_old_directories, :cleanup_old_log_files
     end
   end
 
@@ -74,6 +74,60 @@ RSpec.describe CustomLogSpace::LogWriter do
       it "does not remove any directories" do
         dates.each do |date|
           expect(Dir.exist?(File.join(base_directory, date))).to be(true)
+        end
+      end
+    end
+  end
+
+  describe "#cleanup_old_log_files" do
+    let(:log_date_directory) { File.join(base_directory, "2023-09-03") }
+
+    before do
+      FileUtils.mkdir_p(log_date_directory)
+    end
+
+    after do
+      FileUtils.rm_rf(log_date_directory)
+    end
+
+    context "with more than 10 log files" do
+      let(:log_files) { (20..35).map { |i| "15:#{i}.log" } }
+
+      before do
+        log_files.each do |file|
+          FileUtils.touch(File.join(log_date_directory, file))
+        end
+
+        dummy_instance.cleanup_old_log_files(log_date_directory)
+      end
+
+      it "removes the oldest log files" do
+        (20..25).each do |i|
+          expect(File.exist?(File.join(log_date_directory, "15:#{i}.log"))).to be(false)
+        end
+      end
+
+      it "keeps the 10 newest log files" do
+        (26..35).each do |i|
+          expect(File.exist?(File.join(log_date_directory, "15:#{i}.log"))).to be(true)
+        end
+      end
+    end
+
+    context "with 10 or fewer log files" do
+      let(:log_files) { (20..25).map { |i| "15:#{i}.log" } }
+
+      before do
+        log_files.each do |file|
+          FileUtils.touch(File.join(log_date_directory, file))
+        end
+
+        dummy_instance.cleanup_old_log_files(log_date_directory)
+      end
+
+      it "does not remove any log files" do
+        log_files.each do |file|
+          expect(File.exist?(File.join(log_date_directory, file))).to be(true)
         end
       end
     end
